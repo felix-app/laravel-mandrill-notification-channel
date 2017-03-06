@@ -57,7 +57,12 @@ class MandrillChannel
         if (! empty($message['template_name'])) {
             $method = 'sendTemplate';
             $arguments[] = Arr::get($message, 'template_name');
-            $arguments[] = Arr::get($message, 'template_content', []);
+            $templateContents = Arr::get($message, 'template_content', []);
+            $arguments[] = $templateContents;
+
+            if(!empty($message['message']['merge_language']) && $message['message']['merge_language'] === 'handlebars') {
+                $message['message']['global_merge_vars'] = array_merge(!empty($message['message']['global_merge_vars']) ? $message['message']['global_merge_vars'] : [], $templateContents); 
+            }
         } else {
             $method = 'send';
         }
